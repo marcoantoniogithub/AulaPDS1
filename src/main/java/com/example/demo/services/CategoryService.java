@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entities.Category;
+import com.example.demo.entities.User;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
@@ -27,7 +28,7 @@ public class CategoryService {
 	
 	public Category findById(Long id) {
 		 Optional<Category> obj = repository.findById(id);
-		 return obj.get();
+		 return obj.orElseThrow(() -> new ResourceNotFoundException(id));
 	}
 	
 	public Category insert(Category obj) {
@@ -53,6 +54,7 @@ public class CategoryService {
 			throw new ResourceNotFoundException(id);
 		}
 	}
+	
 
 	private void updateData(Category entity, Category obj) {
 		entity.setName(obj.getName());
