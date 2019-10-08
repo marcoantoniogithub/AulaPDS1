@@ -2,14 +2,30 @@
 
 import java.io.Serializable;
 
-import com.example.demo.entities.User;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
+import org.hibernate.validator.constraints.Length;
+
+import com.example.demo.entities.User;
+import com.example.demo.services.validation.UserUpdateValid;
+
+@UserUpdateValid
 public class UserDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private Long id;
+	
+	@NotEmpty(message = "can't by empty")
+	@Length(min = 5, max = 80, message = "length must be between 5 and 80")
 	private String name;
+
+	@NotEmpty(message = "can't by empty")
+	@Email(message = "invalid email")
 	private String email;
+
+	@NotEmpty(message = "can't by empty")
+	@Length(min = 8, max = 20, message = "length must be between 5 and 80")
 	private String phone;
 	
 	public UserDTO() {
