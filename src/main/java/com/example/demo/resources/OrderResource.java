@@ -1,5 +1,6 @@
 package com.example.demo.resources;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.demo.dto.OrderDTO;
 import com.example.demo.dto.OrderItemDTO;
@@ -51,5 +55,13 @@ public class OrderResource {
 	public ResponseEntity<List<OrderDTO>> findByClientId(@PathVariable Long clientId) {
 		List<OrderDTO> orders = service.findByClientId(clientId);
 		return ResponseEntity.ok().body(orders);
+	}
+
+	@PostMapping
+	public ResponseEntity<OrderDTO> placeOrder(@RequestBody List<OrderItemDTO> dto) {
+		OrderDTO orderDTO = service.placeOrder(dto);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orderDTO.getId())
+				.toUri();
+		return ResponseEntity.created(uri).body(orderDTO);
 	}
 }

@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,8 +14,12 @@ import com.example.demo.dto.OrderDTO;
 import com.example.demo.dto.OrderItemDTO;
 import com.example.demo.entities.Order;
 import com.example.demo.entities.OrderItem;
+import com.example.demo.entities.Product;
 import com.example.demo.entities.User;
+import com.example.demo.entities.enums.OrderStatus;
+import com.example.demo.repositories.OrderItemRepository;
 import com.example.demo.repositories.OrderRepository;
+import com.example.demo.repositories.ProductRepository;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 
@@ -26,6 +31,12 @@ public class OrderService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private ProductRepository productRepository;
+
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	@Autowired
 	private AuthService authService;
@@ -61,5 +72,22 @@ public class OrderService {
 		User client = userRepository.getOne(clientId);
 		List<Order> list = repository.findByClient(client);
 		return list.stream().map(e -> new OrderDTO(e)).collect(Collectors.toList());
+	}
+
+	@Transactional
+	public OrderDTO placeOrder(List<OrderItemDTO> dto) {
+		User client = authService.authenticated();
+		Order order = new Order(null, Instant.now(), OrderStatus.WATTING_PAYMENT, client);
+
+		for (OrderItemDTO itemDTO : dto) {
+			Product product = productRepository.getOne(itemDTO.getProductId());
+			OrderItem item = new OrderItem(order, product, itemDTO.getQuantity(), itemDTO.getPrice());
+			order.getItems().add(item);
+		}
+
+		repository.save(order);
+		orderItemRepository.saveAll(order.getItems());
+
+		return new OrderDTO(order);
 	}
 }
