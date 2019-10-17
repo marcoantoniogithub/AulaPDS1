@@ -13,47 +13,56 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.demo.services.exceptions.DatabaseException;
 import com.example.demo.services.exceptions.JWTAuthenticationException;
+import com.example.demo.services.exceptions.JWTAuthorizationException;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
 public class ResourceExceptionHandler {
-	
+
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request){
+	public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request) {
 		String error = "Resource not found";
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		StandardError err = new StandardError(Instant.now(),status.value() , error, e.getMessage(), 
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				request.getRequestURI());
 		return ResponseEntity.status(status).body(err);
 	}
-	
+
 	@ExceptionHandler(DatabaseException.class)
-	public ResponseEntity<StandardError> database(DatabaseException e, HttpServletRequest request){
+	public ResponseEntity<StandardError> database(DatabaseException e, HttpServletRequest request) {
 		String error = "Database error";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
-		StandardError err = new StandardError(Instant.now(),status.value() , error, e.getMessage(), 
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				request.getRequestURI());
 		return ResponseEntity.status(status).body(err);
 	}
-	
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request){
+	public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
 		String error = "Validation error";
 		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
-		ValidationError err = new ValidationError(Instant.now(),status.value() , error, e.getMessage(), 
+		ValidationError err = new ValidationError(Instant.now(), status.value(), error, e.getMessage(),
 				request.getRequestURI());
-		for (FieldError x: e.getBindingResult().getFieldErrors()) {
+		for (FieldError x : e.getBindingResult().getFieldErrors()) {
 			err.addError(x.getField(), x.getDefaultMessage());
 		}
 		return ResponseEntity.status(status).body(err);
 	}
-	
+
 	@ExceptionHandler(JWTAuthenticationException.class)
-	public ResponseEntity<StandardError> jwtAuthentication(JWTAuthenticationException e, HttpServletRequest request){
+	public ResponseEntity<StandardError> jwtAuthenticationException(JWTAuthenticationException e, HttpServletRequest request) {
 		String error = "Authentication error";
 		HttpStatus status = HttpStatus.UNAUTHORIZED;
-		StandardError err = new StandardError(Instant.now(),status.value() , error, e.getMessage(), 
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(),
 				request.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(JWTAuthorizationException.class)
+	public ResponseEntity<StandardError> jwtAuthorizationonException(JWTAuthorizationException e, HttpServletRequest request) {
+		String error = "Authentication error";
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(status).body(err);
 	}
 }
