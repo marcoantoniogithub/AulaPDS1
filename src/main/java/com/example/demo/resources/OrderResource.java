@@ -19,17 +19,23 @@ public class OrderResource {
 
 	@Autowired
 	private OrderService service;
-	
+
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@GetMapping
-	public ResponseEntity<List<OrderDTO>> findAll(){
+	public ResponseEntity<List<OrderDTO>> findAll() {
 		List<OrderDTO> list = service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
-	
+
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<OrderDTO> findById(@PathVariable Long id){
+	public ResponseEntity<OrderDTO> findById(@PathVariable Long id) {
 		OrderDTO dto = service.findById(id);
 		return ResponseEntity.ok().body(dto);
+	}
+
+	@GetMapping(value = "/myorders")
+	public ResponseEntity<List<OrderDTO>> findByClient() {
+		List<OrderDTO> orders = service.findByClient();
+		return ResponseEntity.ok().body(orders);
 	}
 }
