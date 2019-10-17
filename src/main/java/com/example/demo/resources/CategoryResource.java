@@ -38,11 +38,17 @@ public class CategoryResource {
 		return ResponseEntity.ok().body(dto);
 	}
 
+	@GetMapping(value = "/product/{productId}")
+	public ResponseEntity<List<CategoryDTO>> findByProduct(@PathVariable Long productId) {
+		List<CategoryDTO> categories = service.findByProduct(productId);
+		return ResponseEntity.ok().body(categories);
+	}
+
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@PostMapping
 	public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto) {
-		dto = service.insert(dto);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
+		CategoryDTO newDTO = service.insert(dto);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newDTO.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);
 	}
 
