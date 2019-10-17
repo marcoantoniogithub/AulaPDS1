@@ -97,5 +97,4 @@ public class OrderDTO implements Serializable{
 		User client = new User(clientId,clientName,clientEmail,null,null);
 		return new Order(id,moment, orderStatus, client);
 	}
-	
 }
