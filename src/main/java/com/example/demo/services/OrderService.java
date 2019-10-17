@@ -2,15 +2,20 @@ package com.example.demo.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.OrderDTO;
+import com.example.demo.dto.OrderItemDTO;
 import com.example.demo.entities.Order;
+import com.example.demo.entities.OrderItem;
 import com.example.demo.entities.User;
 import com.example.demo.repositories.OrderRepository;
+import com.example.demo.repositories.UserRepository;
 import com.example.demo.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -18,6 +23,9 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepository repository;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	@Autowired
 	private AuthService authService;
@@ -34,8 +42,23 @@ public class OrderService {
 		return new OrderDTO(entity);
 	}
 
+	@Transactional(readOnly = true)
+	public List<OrderItemDTO> findItems(Long id) {
+		Order order = repository.getOne(id);
+		authService.validadeOwnOrderOrAdmin(order);
+		Set<OrderItem> set = order.getItems();
+		return set.stream().map(e -> new OrderItemDTO(e)).collect(Collectors.toList());
+	}
+
 	public List<OrderDTO> findByClient() {
 		User client = authService.authenticated();
+		List<Order> list = repository.findByClient(client);
+		return list.stream().map(e -> new OrderDTO(e)).collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
+	public List<OrderDTO> findByClientId(Long clientId) {
+		User client = userRepository.getOne(clientId);
 		List<Order> list = repository.findByClient(client);
 		return list.stream().map(e -> new OrderDTO(e)).collect(Collectors.toList());
 	}
