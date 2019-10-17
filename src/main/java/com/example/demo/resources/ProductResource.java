@@ -35,12 +35,14 @@ public class ProductResource {
 	private ProductService service;
 
 	@GetMapping
-	public ResponseEntity<Page<ProductDTO>> findAllPaged(@RequestParam(value = "page", defaultValue = "0") Integer page,
+	public ResponseEntity<Page<ProductDTO>> findAllPaged(@RequestParam(value = "name", defaultValue = "") String name,
+			@RequestParam(value = "categories", defaultValue = "") String categories,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
 			@RequestParam(value = "orderBy", defaultValue = "name") String orderby,
 			@RequestParam(value = "direction", defaultValue = "ASC") String direction) {
 		PageRequest pagerequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderby);
-		Page<ProductDTO> list = service.findAllPaged(pagerequest);
+		Page<ProductDTO> list = service.findByNameCategoryPaged(name, categories, pagerequest);
 		return ResponseEntity.ok().body(list);
 	}
 
