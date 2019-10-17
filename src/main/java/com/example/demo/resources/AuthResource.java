@@ -16,11 +16,17 @@ import com.example.demo.services.AuthService;
 public class AuthResource {
 
 	@Autowired
-	private AuthService service; 
+	private AuthService service;
 
 	@PostMapping("/login")
 	public ResponseEntity<TokenDTO> login(@RequestBody CredentialsDTO dto) {
-		TokenDTO tokenDTO = service.authenticate(dto);	
+		TokenDTO tokenDTO = service.authenticate(dto);
+		return ResponseEntity.ok().body(tokenDTO);
+	}
+
+	@PostMapping("/refresh")
+	public ResponseEntity<TokenDTO> refresh() {
+		TokenDTO tokenDTO = service.refreshToken();
 		return ResponseEntity.ok().body(tokenDTO);
 	}
 }
